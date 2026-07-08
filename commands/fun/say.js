@@ -11,6 +11,16 @@ module.exports = {
         ),
 
     async execute(interaction) {
+        const hrRoleId = "1481953102654607451"; // HR role ID
+
+        // Permission check (same style as /purge)
+        if (!interaction.member.roles.cache.has(hrRoleId)) {
+            return interaction.reply({
+                content: "You do not have permission to use this command.",
+                flags: 64
+            });
+        }
+
         const message = interaction.options.getString("message");
 
         // Confirm privately
