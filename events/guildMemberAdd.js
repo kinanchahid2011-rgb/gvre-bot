@@ -10,7 +10,7 @@ module.exports = {
     if (!channel) return;
 
     const description =
-      `> <:arrowright:1523736161770672209> Welcome to **Greenville Roleplay East**, please head to <#1481962763994660964> to verify yourself and gain access to the rest of the server. ${member}!\n` +
+      `> <:arrowright:1523736161770672209> Welcome to **Greenville Roleplay East**, please head to <#1481962763994660964> to verify yourself and gain access to the rest of the server. ${member}!\n\n` +
       `> <:arrowright:1523736161770672209> After verifying, visit <#1481953494519775254> to get familiar with our rules, FAQs, and department applications. We hope you enjoy your time here!`;
 
     const { embed, files } = embedTemplate({
