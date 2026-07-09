@@ -37,7 +37,7 @@ module.exports = {
       `> <:arrowright2:1523737938960322640> **Reason:** ${notes}`;
 
     const { embed, files } = embedTemplate({
-      title: "<:shines:1524097104547680276> Greenville Roleplay East - *__Session Cancelled__* <:shines:1524097104547680276>",
+      title: "<a:startilt:1524621292790222989> Greenville Roleplay East - *__Session Cancelled__* <a:startilt:1524621292790222989>",
       description,
       banner: path.join(__dirname, "../../graphics/gvrecancelled.png")
     });

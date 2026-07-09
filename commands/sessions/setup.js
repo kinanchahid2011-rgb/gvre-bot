@@ -28,7 +28,7 @@ module.exports = {
 
     // Build setup embed using template
     const { embed, files } = embedTemplate({
-      title: "<:shines:1524097104547680276> Greenville Roleplay East - *__Session Setup__* <:shines:1524097104547680276>",
+      title: "<a:loadingnine:1524621545861812335> Greenville Roleplay East - *__Session Setup__* <a:loadingnine:1524621545861812335>",
       description:
         `> <:arrowright:1523736161770672209> The reaction goal has been reached! The host is now setting up the session. Please be patient. Thank you for your cooperation!`,
     });

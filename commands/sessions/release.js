@@ -66,14 +66,14 @@ module.exports = {
       `> <:arrowright:1523736161770672209> ${host} has released their session.\n` +
       `> <:arrowright:1523736161770672209> Please read the rules below before joining.\n\n` +
       `> **Session Rules:**\n` +
-      `> <:arrowright2:1523737938960322640> **Peacetime Status:** ${peacetime}\n` +
-      `> <:arrowright2:1523737938960322640> **Fail Roleplay Speeds:** ${frp}MPH\n` +
-      `> <:arrowright2:1523737938960322640> **Public Service(s) Status:** ${ps}\n` +
-      `> <:arrowright2:1523737938960322640> **Area of Roleplay:** ${aorp}\n\n` +
-      `> <:arrowright:1523736161770672209> Click the button below to receive the session link privately.\n`;
+      `> <:bulletpoint:1524621721318195230> **Peacetime Status:** ${peacetime}\n` +
+      `> <:bulletpoint:1524621721318195230> **Fail Roleplay Speeds:** ${frp}MPH\n` +
+      `> <:bulletpoint:1524621721318195230> **Public Service(s) Status:** ${ps}\n` +
+      `> <:bulletpoint:1524621721318195230> **Area of Roleplay:** ${aorp}\n\n` +
+      `> <:gvreasterisk:1524624524849582101> Click the button below to receive the session link privately.\n`;
 
     const { embed, files } = embedTemplate({
-      title: "<:shines:1524097104547680276> Greenville Roleplay East - *__Session Release__* <:shines:1524097104547680276>",
+      title: "<a:startilt:1524621292790222989> Greenville Roleplay East - *__Session Release__* <a:startilt:1524621292790222989>",
       description,
       banner: path.join(__dirname, "../../graphics/gvrerelease.png")
     });

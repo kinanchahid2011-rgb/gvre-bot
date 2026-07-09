@@ -57,7 +57,7 @@ module.exports = {
       `> <:arrowright:1523736161770672209> Click the button below to receive the reinvite link privately.`;
 
     const { embed, files } = embedTemplate({
-      title: "<:shines:1524097104547680276> Greenville Roleplay East - *__Reinvites__* <:shines:1524097104547680276>",
+      title: "<a:startilt:1524621292790222989> Greenville Roleplay East - *__Reinvites__* <a:startilt:1524621292790222989>",
       description,
       banner: path.join(__dirname, "../../graphics/gvrereinvites.png")
     });

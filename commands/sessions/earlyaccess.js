@@ -43,11 +43,11 @@ module.exports = {
     const description =
       `> <:arrowright:1523736161770672209> ${host} has opened **Early Access** for their session.\n` +
       `> <:arrowright:1523736161770672209> Early access members may now join using the button below.\n\n` +
-      `> <:arrowright:1523736161770672209> Please wait for the public release announcement.`;
+      `> <:gvreasterisk:1524624524849582101> Please wait for the public release announcement.`;
 
     const { embed, files } = embedTemplate({
       title:
-        "<:shines:1524097104547680276> Greenville Roleplay East - *__Early Access__* <:shines:1524097104547680276>",
+        "<a:excitedfastforward:1524620959787515975> Greenville Roleplay East - *__Early Access__* <a:excitedfastforward:1524620959787515975>",
       description,
       banner: path.join(__dirname, "../../graphics/gvreea.png"),
     });

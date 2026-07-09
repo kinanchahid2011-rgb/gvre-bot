@@ -92,16 +92,16 @@ module.exports = {
     // 🧱 Build summary embed
     const description =
       `${host} has ended their session.\n\n` +
-      `> <:arrowright:1523736161770672209> **Session Summary**\n` +
-      `> <:arrowright2:1523737938960322640> **Start Time:** <t:${Math.floor(startTime.getTime() / 1000)}:F>\n` +
-      `> <:arrowright2:1523737938960322640> **Finish Time:** <t:${Math.floor(finishTime.getTime() / 1000)}:F>\n` +
-      `> <:arrowright2:1523737938960322640> **Total Duration:** ${totalHours}h ${remainingMinutes}m\n` +
-      `> <:arrowright2:1523737938960322640> **Reinvites Sent:** ${reinvitesCount}\n\n` +
-      `> <:arrowright2:1523737938960322640> **Host Notes:** ${notes}`;
+      `> **Session Summary**\n` +
+      `> <:bulletpoint:1524621721318195230> **Start Time:** <t:${Math.floor(startTime.getTime() / 1000)}:F>\n` +
+      `> <:bulletpoint:1524621721318195230> **Finish Time:** <t:${Math.floor(finishTime.getTime() / 1000)}:F>\n` +
+      `> <:bulletpoint:1524621721318195230> **Total Duration:** ${totalHours}h ${remainingMinutes}m\n` +
+      `> <:bulletpoint:1524621721318195230> **Reinvites Sent:** ${reinvitesCount}\n\n` +
+      `> <:gvreasterisk:1524624524849582101> **Host Notes:** ${notes}`;
 
     const { embed, files } = embedTemplate({
       title:
-        "<:shines:1524097104547680276> Greenville Roleplay East - *__Session Over__* <:shines:1524097104547680276>",
+        "<a:startilt:1524621292790222989> Greenville Roleplay East - *__Session Over__* <a:startilt:1524621292790222989>",
       description,
       banner: path.join(__dirname, "../../graphics/gvreover.png"),
     });
