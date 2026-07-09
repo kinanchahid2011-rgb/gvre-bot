@@ -4,7 +4,7 @@ const embedTemplate = require("../utils/embedTemplate");
 module.exports = {
   name: "guildMemberAdd",
 
-  async execute(member) {
+  async execute(member, client) { // 👈 added client
     const channelId = "1482299778170622033"; // #welcome channel
     const channel = member.guild.channels.cache.get(channelId);
     if (!channel) return;
@@ -20,14 +20,12 @@ module.exports = {
       thumbnail: member.user.displayAvatarURL({ dynamic: true })
     });
 
-    // 🟢 Send ping + embed in server
     await channel.send({
       content: `${member}`,
       embeds: [embed],
       files
     });
 
-    // 💬 Send same embed in DMs
     try {
       await member.send({
         embeds: [embed],

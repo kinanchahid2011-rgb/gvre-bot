@@ -4,7 +4,7 @@ const embedTemplate = require("../utils/embedTemplate");
 module.exports = {
   name: "guildMemberRemove",
 
-  async execute(member) {
+  async execute(member, client) { // 👈 added client
     const channelId = "1524653816505700472"; // goodbye channel
     const channel = member.guild.channels.cache.get(channelId);
     if (!channel) return;
@@ -14,36 +14,32 @@ module.exports = {
 
     const isPartner = member.roles.cache.has(partnerRoleId);
 
-    // Base description
-    let description = `> <:arrowright:1523736161770672209> **${member.user.tag}** has left **Greenville Roleplay East**. We hope to see you again soon — thank you for being part of our community!`;
+    let description =
+      `> <:arrowright:1523736161770672209> **${member.user.tag}** has left **Greenville Roleplay East**. We hope to see you again soon — thank you for being part of our community!`;
 
-    // Add partner line if applicable
     if (isPartner) {
       description += `\n\n> <:arrowright:1523736161770672209> **Partner has left the server.**`;
     }
 
-    // Build embed
     const { embed, files } = embedTemplate({
-      title:
-        "<:shines:1524097104547680276> Goodbye from **GVRE** <:shines:1524097104547680276>",
+      title: "<:shines:1524097104547680276> Goodbye from GVRE <:shines:1524097104547680276>",
       description,
       banner: path.join(__dirname, "../graphics/gvrebye.png"),
       thumbnail: member.user.displayAvatarURL({ dynamic: true }),
-      color: isPartner ? 0xffe481 : undefined, // gold for partners
+      color: isPartner ? 0xffe481 : undefined
     });
 
-    // Send goodbye embed
     if (isPartner) {
       await channel.send({
         content: `<@&${hrRoleId}>`, // HR ping ABOVE the embed
         embeds: [embed],
-        files,
+        files
       });
     } else {
       await channel.send({
         embeds: [embed],
-        files,
+        files
       });
     }
-  },
+  }
 };
