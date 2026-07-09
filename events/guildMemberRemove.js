@@ -4,7 +4,8 @@ const embedTemplate = require("../utils/embedTemplate");
 module.exports = {
   name: "guildMemberRemove",
 
-  async execute(member, client) { // 👈 added client
+  async execute(member, client) {
+
     const channelId = "1524653816505700472"; // goodbye channel
     const channel = member.guild.channels.cache.get(channelId);
     if (!channel) return;
@@ -24,14 +25,14 @@ module.exports = {
     const { embed, files } = embedTemplate({
       title: "<:shines:1524097104547680276> Goodbye from GVRE <:shines:1524097104547680276>",
       description,
-      banner: path.join(__dirname, "../graphics/gvrebye.png"),
+      banner: path.join(__dirname, "../graphics/gvregoodbye.png"),
       thumbnail: member.user.displayAvatarURL({ dynamic: true }),
       color: isPartner ? 0xffe481 : undefined
     });
 
     if (isPartner) {
       await channel.send({
-        content: `<@&${hrRoleId}>`, // HR ping ABOVE the embed
+        content: `<@&${hrRoleId}>`,
         embeds: [embed],
         files
       });
