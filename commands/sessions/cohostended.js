@@ -17,8 +17,7 @@ module.exports = {
     const host = interaction.user;
 
     const description =
-      `> <:arrowright:1523736161770672209> ${host} has ended their co-host’s duties for this session.\n\n` +
-      `> <:arrowright:1523736161770672209> Thank you for assisting!`;
+      `> <:arrowright:1523736161770672209> ${host} has ended their co-host’s duties for this session. Thank you for assisting!`;
 
     const { embed } = embedTemplate({
       title: "<:shines:1524097104547680276> Greenville Roleplay East - *__Co-host Ended__* <:shines:1524097104547680276>",

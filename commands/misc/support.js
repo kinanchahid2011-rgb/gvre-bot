@@ -75,22 +75,22 @@ module.exports = {
         {
           label: "General Support",
           description: "Questions or help with server features",
-          value: "general",
+          value: "General",
         },
         {
           label: "User Report",
           description: "Report a user for rule violations",
-          value: "user",
+          value: "User",
         },
         {
           label: "Staff Report",
           description: "Report a staff member for misconduct",
-          value: "staff",
+          value: "Staff",
         },
         {
           label: "Partnership",
           description: "Inquire about partnerships or collaborations",
-          value: "partner",
+          value: "Partner",
         },
       ]);
 
@@ -188,19 +188,19 @@ module.exports = {
 
       // Determine ping role
       const pingRole =
-        category === "staff" || category === "partner"
+        category === "Staff" || category === "Partner"
           ? `<@&${hrRole}> <@${opener.id}>`
           : `<@&${staffTeamRole}> <@${opener.id}>`;
 
       // Instructions
       let instructions;
-      if (category === "general")
+      if (category === "General")
         instructions = "Please describe your inquiry in detail.";
-      else if (category === "partner")
+      else if (category === "Partner")
         instructions = "Please describe your partnership request.";
-      else if (category === "user")
+      else if (category === "User")
         instructions = "Please provide evidence of the user's actions.";
-      else if (category === "staff")
+      else if (category === "Staff")
         instructions = "Please provide evidence of the staff member's actions.";
 
       const { embed, files } = embedTemplate({
