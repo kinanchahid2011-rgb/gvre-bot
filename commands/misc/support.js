@@ -210,19 +210,19 @@ module.exports = {
           `> <:arrowright:1523736161770672209> **Category:** Partnership\n` +
           `> <:arrowright:1523736161770672209> **Opened By:** ${opener}\n\n` +
           `> <:arrowright2:1523737938960322640> Please provide the following information:\n` +
-          `> <:bulletpoint:1524621721318195230> **Server Name** – The name of your server.\n` +
-          `> <:bulletpoint:1524621721318195230> **Member Count** – Approximate number of members.\n` +
-          `> <:bulletpoint:1524621721318195230> **Agreement to Stay in GVRE** – Confirm that you agree to remain in GVRE while partnered.\n` +
-          `> <:bulletpoint:1524621721318195230> **Additional Details** – Any extra information about your server or partnership goals.\n\n` +
+          `> <:bulletpoint:1524621721318195230> **Server Name**\n` +
+          `> <:bulletpoint:1524621721318195230> **Member Count**\n` +
+          `> <:bulletpoint:1524621721318195230> **Do you agree to stay in GVRE?**\n` +
+          `> <:bulletpoint:1524621721318195230> **Additional Details** – Optional\n\n` +
           `> <:arrowright:1523736161770672209> Our team will review your application and respond shortly.`;
       } else if (category === "User") {
         description =
           `> <:arrowright:1523736161770672209> **Category:** User Report\n` +
           `> <:arrowright:1523736161770672209> **Opened By:** ${opener}\n\n` +
           `> <:arrowright2:1523737938960322640> Please provide the following information:\n` +
-          `><:bulletpoint:1524621721318195230> **User You Want to Report** – Their username or ID.\n` +
-          `> <:bulletpoint:1524621721318195230> **Reason for Report** – Clearly explain what happened.\n` +
-          `> <:bulletpoint:1524621721318195230> **Evidence (Required)** – Screenshots, links, or any proof supporting your report.\n\n` +
+          `> <:bulletpoint:1524621721318195230> **User You Want to Report**\n` +
+          `> <:bulletpoint:1524621721318195230> **Reason for Report**\n` +
+          `> <:bulletpoint:1524621721318195230> **Evidence (Required)**\n\n` +
           `> <:arrowright:1523736161770672209> Reports **must include evidence** for staff to take action.\n` +
           `> <:arrowright:1523736161770672209> Our team will review your report and respond shortly.`;
       } else if (category === "Staff") {
@@ -230,9 +230,9 @@ module.exports = {
           `> <:arrowright:1523736161770672209> **Category:** Staff Report\n` +
           `> <:arrowright:1523736161770672209> **Opened By:** ${opener}\n\n` +
           `> <:arrowright2:1523737938960322640> Please provide the following information:\n` +
-          `> <:bulletpoint:1524621721318195230> **Staff Member You Want to Report** – Their username or ID.\n` +
-          `> <:bulletpoint:1524621721318195230> **Reason for Report** – Clearly explain what happened.\n` +
-          `> <:bulletpoint:1524621721318195230> **Evidence (Required)** – Screenshots, links, or any proof supporting your report.\n\n` +
+          `> <:bulletpoint:1524621721318195230> **Staff Member You Want to Report**\n` +
+          `> <:bulletpoint:1524621721318195230> **Reason for Report**\n` +
+          `> <:bulletpoint:1524621721318195230> **Evidence (Required)**\n\n` +
           `> <:arrowright:1523736161770672209> Reports **must include evidence** for HR to take action.\n` +
           `> Our team will review your report and respond shortly.`;
       } else {
