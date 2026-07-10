@@ -114,7 +114,7 @@ module.exports = {
 
     // 🔹 Dropdown collector
     const collector = message.createMessageComponentCollector({
-      time: 600000,
+      time: 0, // infinite
     });
 
     collector.on("collect", async (selectInteraction) => {

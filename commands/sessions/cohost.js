@@ -17,9 +17,8 @@ module.exports = {
     const host = interaction.user;
 
     const description =
-      `> <:arrowright:1523736161770672209> ${host} is now co-hosting the session.\n\n` +
-      `> <:arrowright:1523736161770672209> Please cooperate with them during the session.`;
-
+      `> <:arrowright:1523736161770672209> ${host} is now co-hosting the session. Please cooperate with them during the session.`;
+      
     const { embed } = embedTemplate({
       title: "<:shines:1524097104547680276> Greenville Roleplay East - *__Co-host__* <:shines:1524097104547680276>",
       description
