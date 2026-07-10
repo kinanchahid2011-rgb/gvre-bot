@@ -37,7 +37,7 @@ module.exports = {
       title: "<:shines:1524097104547680276> New Suggestion <:shines:1524097104547680276>",
       description:
         `> <a:startilt:1524621292790222989> **Suggested By:** ${user} (${user.id})\n\n` +
-        `> <a:startilt:1524621292790222989> **Suggestion:**\n${suggestion}`,
+        `> <a:startilt:1524621292790222989> **Suggestion:** ${suggestion}`,
       thumbnail: user.displayAvatarURL({ dynamic: true }),
       color: 0x3cf65b,
     });
