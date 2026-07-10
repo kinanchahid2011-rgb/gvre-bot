@@ -33,7 +33,8 @@ module.exports = {
 
     // ⭐ LOG: Support command used
     if (generalLogChannel) {
-      const timestamp = new Date().toLocaleString("en-GB", { hour12: true });
+      const unix = Math.floor(Date.now() / 1000);
+      const timestamp = `<t:${unix}:F>`;
 
       const { embed: logEmbed } = embedTemplate({
         title:
@@ -168,7 +169,8 @@ module.exports = {
 
       // ⭐ LOG: Ticket opened
       if (generalLogChannel) {
-        const timestamp = new Date().toLocaleString("en-GB", { hour12: true });
+        const unix = Math.floor(Date.now() / 1000);
+        const timestamp = `<t:${unix}:F>`;
 
         const { embed: logEmbed } = embedTemplate({
           title:
@@ -192,25 +194,58 @@ module.exports = {
           ? `<@&${hrRole}> <@${opener.id}>`
           : `<@&${staffTeamRole}> <@${opener.id}>`;
 
-      // Instructions
-      let instructions;
-      if (category === "General")
-        instructions = "Please describe your inquiry in detail.";
-      else if (category === "Partner")
-        instructions = "Please describe your partnership request.";
-      else if (category === "User")
-        instructions = "Please provide evidence of the user's actions.";
-      else if (category === "Staff")
-        instructions = "Please provide evidence of the staff member's actions.";
+      // Form-style instructions per category
+      let description;
+
+      if (category === "General") {
+        description =
+          `> <:arrowright:1523736161770672209> **Category:** General Support\n` +
+          `> <:arrowright:1523736161770672209> **Opened By:** ${opener}\n\n` +
+          `> <:arrowright2:1523737938960322640> Please answer the following in this ticket:\n` +
+          `> <:bulletpoint:1524621721318195230> **Describe your inquiry in detail.**\n` +
+          `> <:bulletpoint:1524621721318195230> Include any relevant context (channels, users, or actions).\n\n` +
+          `> Our team will respond shortly.`;
+      } else if (category === "Partner") {
+        description =
+          `> <:arrowright:1523736161770672209> **Category:** Partnership\n` +
+          `> <:arrowright:1523736161770672209> **Opened By:** ${opener}\n\n` +
+          `> <:arrowright2:1523737938960322640> Please provide the following information:\n` +
+          `> <:bulletpoint:1524621721318195230> **Server Name** – The name of your server.\n` +
+          `> <:bulletpoint:1524621721318195230> **Member Count** – Approximate number of members.\n` +
+          `> <:bulletpoint:1524621721318195230> **Agreement to Stay in GVRE** – Confirm that you agree to remain in GVRE while partnered.\n` +
+          `> <:bulletpoint:1524621721318195230> **Additional Details** – Any extra information about your server or partnership goals.\n\n` +
+          `> <:arrowright:1523736161770672209> Our team will review your application and respond shortly.`;
+      } else if (category === "User") {
+        description =
+          `> <:arrowright:1523736161770672209> **Category:** User Report\n` +
+          `> <:arrowright:1523736161770672209> **Opened By:** ${opener}\n\n` +
+          `> <:arrowright2:1523737938960322640> Please provide the following information:\n` +
+          `><:bulletpoint:1524621721318195230> **User You Want to Report** – Their username or ID.\n` +
+          `> <:bulletpoint:1524621721318195230> **Reason for Report** – Clearly explain what happened.\n` +
+          `> <:bulletpoint:1524621721318195230> **Evidence (Required)** – Screenshots, links, or any proof supporting your report.\n\n` +
+          `> <:arrowright:1523736161770672209> Reports **must include evidence** for staff to take action.\n` +
+          `> <:arrowright:1523736161770672209> Our team will review your report and respond shortly.`;
+      } else if (category === "Staff") {
+        description =
+          `> <:arrowright:1523736161770672209> **Category:** Staff Report\n` +
+          `> <:arrowright:1523736161770672209> **Opened By:** ${opener}\n\n` +
+          `> <:arrowright2:1523737938960322640> Please provide the following information:\n` +
+          `> <:bulletpoint:1524621721318195230> **Staff Member You Want to Report** – Their username or ID.\n` +
+          `> <:bulletpoint:1524621721318195230> **Reason for Report** – Clearly explain what happened.\n` +
+          `> <:bulletpoint:1524621721318195230> **Evidence (Required)** – Screenshots, links, or any proof supporting your report.\n\n` +
+          `> <:arrowright:1523736161770672209> Reports **must include evidence** for HR to take action.\n` +
+          `> Our team will review your report and respond shortly.`;
+      } else {
+        description =
+          `> <:arrowright:1523736161770672209> **Category:** ${category}\n` +
+          `> <:arrowright:1523736161770672209> **Opened By:** ${opener}\n\n` +
+          `> Please describe your request in detail.`;
+      }
 
       const { embed, files } = embedTemplate({
         title:
           "<:shines:1524097104547680276> GVRE Support Ticket <:shines:1524097104547680276>",
-        description:
-          `> <:arrowright:1523736161770672209> **Category:** ${category}\n` +
-          `> <:arrowright:1523736161770672209> **Opened By:** ${opener}\n\n` +
-          `> <:arrowright:1523736161770672209> ${instructions}\n\n` +
-          `> <:arrowright2:1523737938960322640> Our team will respond shortly.`,
+        description,
         banner: path.join(__dirname, "../../graphics/gvresupport.png"),
         thumbnail: interaction.client.user.displayAvatarURL(),
       });
@@ -250,10 +285,10 @@ module.exports = {
 
         await btnInteraction.deferUpdate();
 
-        const now = new Date();
         const unix = Math.floor(Date.now() / 1000);
         const timestamp = `<t:${unix}:F>`;
 
+        // CLAIM
         if (claimButton.data.style === ButtonStyle.Success) {
           claimButton.setStyle(ButtonStyle.Danger).setLabel("Unclaim Ticket");
 
@@ -284,6 +319,14 @@ module.exports = {
             generalLogChannel.send({ embeds: [logEmbed] }).catch(() => {});
           }
         } else {
+          // UNCLAIM — only claimer can unclaim
+          if (btnInteraction.user.id !== channel.claimerId) {
+            return btnInteraction.followUp({
+              content: "Only the current claimer can unclaim this ticket.",
+              flags: 64,
+            });
+          }
+
           claimButton.setStyle(ButtonStyle.Success).setLabel("Claim Ticket");
 
           channel.claimerId = null;
