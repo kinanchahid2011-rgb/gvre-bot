@@ -36,7 +36,7 @@ module.exports = {
       title: "<a:startilt:1524621292790222989> Greenville Roleplay East - *__Session Startup__* <a:startilt:1524621292790222989>",
       description:
         `> <:arrowright:1523736161770672209> ${host} is hosting a session. If you wish to join, please react below. Make sure you have read all the information and rules  in <#1481953494519775254>.\n\n` +
-        `> **Startup Information**\n` +
+        `**Startup Information**\n` +
         `> <:bulletpoint:1524621721318195230> If the reaction requirement is not met within 20 minutes, the session will be cancelled.\n` +
         `> <:bulletpoint:1524621721318195230> Reacting but not joining the session will result in moderation.\n\n` +
         `> <:gvreasterisk:1524624524849582101> For this session to commence, **${reactionsNeeded}** reactions are required.`,

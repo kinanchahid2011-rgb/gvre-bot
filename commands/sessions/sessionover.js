@@ -93,11 +93,11 @@ module.exports = {
     const description =
       `${host} has ended their session.\n\n` +
       `> **Session Summary**\n` +
-      `> <:bulletpoint:1524621721318195230> **Start Time:** <t:${Math.floor(startTime.getTime() / 1000)}:F>\n` +
-      `> <:bulletpoint:1524621721318195230> **Finish Time:** <t:${Math.floor(finishTime.getTime() / 1000)}:F>\n` +
-      `> <:bulletpoint:1524621721318195230> **Total Duration:** ${totalHours}h ${remainingMinutes}m\n` +
-      `> <:bulletpoint:1524621721318195230> **Reinvites Sent:** ${reinvitesCount}\n\n` +
-      `> <:gvreasterisk:1524624524849582101> **Host Notes:** ${notes}`;
+      `> <:bulletpoint:1524621721318195230> **__Start Time:__** <t:${Math.floor(startTime.getTime() / 1000)}:F>\n` +
+      `> <:bulletpoint:1524621721318195230> **__Finish Time:__** <t:${Math.floor(finishTime.getTime() / 1000)}:F>\n` +
+      `> <:bulletpoint:1524621721318195230> **__Total Duration:__** ${totalHours}h ${remainingMinutes}m\n` +
+      `> <:bulletpoint:1524621721318195230> **__Reinvites Sent:__** ${reinvitesCount}\n\n` +
+      `> <:gvreasterisk:1524624524849582101> **__Host Notes:__** ${notes}`;
 
     const { embed, files } = embedTemplate({
       title:

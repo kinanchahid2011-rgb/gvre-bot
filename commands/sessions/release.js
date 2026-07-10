@@ -65,11 +65,11 @@ module.exports = {
     const description =
       `> <:arrowright:1523736161770672209> ${host} has released their session.\n` +
       `> <:arrowright:1523736161770672209> Please read the rules below before joining.\n\n` +
-      `> **Session Rules:**\n` +
-      `> <:bulletpoint:1524621721318195230> **Peacetime Status:** ${peacetime}\n` +
-      `> <:bulletpoint:1524621721318195230> **Fail Roleplay Speeds:** ${frp}MPH\n` +
-      `> <:bulletpoint:1524621721318195230> **Public Service(s) Status:** ${ps}\n` +
-      `> <:bulletpoint:1524621721318195230> **Area of Roleplay:** ${aorp}\n\n` +
+      `**Session Rules:**\n` +
+      `> <:bulletpoint:1524621721318195230> **__Peacetime Status:__** ${peacetime}\n` +
+      `> <:bulletpoint:1524621721318195230> **__Fail Roleplay Speeds:__** ${frp}MPH\n` +
+      `> <:bulletpoint:1524621721318195230> **__Public Service(s) Status__:** ${ps}\n` +
+      `> <:bulletpoint:1524621721318195230> **__Area of Roleplay:__** ${aorp}\n\n` +
       `> <:gvreasterisk:1524624524849582101> Click the button below to receive the session link privately.\n`;
 
     const { embed, files } = embedTemplate({
