@@ -46,7 +46,7 @@ module.exports = {
       return interaction.reply({
         content:
           "❌ Invalid duration format. Use formats like `10s`, `5m`, `2h`, `3d`, `1mo`, `1y`.",
-        ephemeral: true,
+        flags: 64,
       });
     }
 
@@ -95,7 +95,7 @@ module.exports = {
 
     await interaction.reply({
       content: `✅ Giveaway started for **${prize}**! Ends <t:${endTimestamp}:R>.`,
-      ephemeral: true,
+      flags: 64,
     });
   },
 };
