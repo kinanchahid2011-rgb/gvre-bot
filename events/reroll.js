@@ -1,4 +1,4 @@
-const { loadGiveaways } = require("../../giveaway/giveawayutils");
+const { loadGiveaways } = require("../giveaway/giveawayutils");
 const embedTemplate = require("../../utils/embedTemplate");
 const path = require("node:path");
 
