@@ -65,7 +65,7 @@ module.exports = {
         (roleRestrictions.length
           ? `> <:arrowright:1523736161770672209> **Role Restrictions:** ${roleRestrictions.map(r => `<@&${r}>`).join(", ")}`
           : "") +
-        `\n\nReact with <a:startilt:1524621292790222989> to enter!`,
+        `\n\n> React with <a:startilt:1524621292790222989> to enter!`,
       banner: path.join(__dirname, "../../graphics/gvregiveaway.png"),
       thumbnail: interaction.user.displayAvatarURL({ dynamic: true }),
       color: 0x3cf65b,
