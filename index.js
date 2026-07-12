@@ -14,6 +14,7 @@ const {
 const fs = require("node:fs");
 const path = require("node:path");
 const embedTemplate = require("./utils/embedTemplate");
+require("./giveaway/giveawayhandler")(client);
 
 // -----------------------------------------------------
 // LOGGING SETUP
