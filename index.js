@@ -14,7 +14,6 @@ const {
 const fs = require("node:fs");
 const path = require("node:path");
 const embedTemplate = require("./utils/embedTemplate");
-require("./giveaway/giveawayhandler")(client);
 
 // -----------------------------------------------------
 // LOGGING SETUP
@@ -68,6 +67,8 @@ const client = new Client({
   ],
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
+
+require("./giveaway/giveawayhandler")(client);
 
 client.commands = new Collection();
 
