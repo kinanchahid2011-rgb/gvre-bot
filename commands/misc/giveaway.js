@@ -78,7 +78,7 @@ module.exports = {
       files,
     });
 
-    await msg.react("<a:startilt:1524621292790222989>");
+    await msg.react("1524621292790222989");
 
     // Save giveaway data for handler
     await saveGiveaway({
