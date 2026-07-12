@@ -1,12 +1,11 @@
 const { loadGiveaways } = require("../giveaway/giveawayutils");
-const embedTemplate = require("../../utils/embedTemplate");
+const embedTemplate = require("../utils/embedTemplate"); // ✅ FIXED PATH
 const path = require("node:path");
 
 module.exports = {
   name: "messageCreate",
 
   async execute(message, client) {
-    // Only HR can reroll
     const hrRoleId = "1481953102654607451";
 
     if (!message.content.startsWith("-reroll")) return;
@@ -44,12 +43,10 @@ module.exports = {
       const users = await reaction.users.fetch();
       let entrants = users.filter(u => !u.bot);
 
-      // Apply AND role restrictions
       if (giveaway.roleRestrictions.length > 0) {
         entrants = entrants.filter(u => {
           const member = guild.members.cache.get(u.id);
           if (!member) return false;
-
           return giveaway.roleRestrictions.every(roleId =>
             member.roles.cache.has(roleId)
           );
@@ -57,9 +54,8 @@ module.exports = {
       }
 
       const entrantArray = Array.from(entrants.values());
+      const winners = [];
 
-      // Pick winners
-      let winners = [];
       if (entrantArray.length > 0) {
         for (let i = 0; i < giveaway.winners; i++) {
           if (entrantArray.length === 0) break;
@@ -69,7 +65,6 @@ module.exports = {
         }
       }
 
-      // Build reroll embed
       const { embed, files } = embedTemplate({
         title: "<a:startilt:1524621292790222989> Giveaway Rerolled <a:startilt:1524621292790222989>",
         description:
@@ -91,7 +86,6 @@ module.exports = {
       });
 
       await message.reply("🔄 Giveaway rerolled successfully.");
-
     } catch (err) {
       console.error("Reroll error:", err);
       return message.reply("❌ An error occurred while rerolling.");
