@@ -34,6 +34,7 @@ module.exports = {
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles),
 
   async execute(interaction) {
+    await interaction.deferReply({ flags: 64 });
     const prize = interaction.options.getString("prize");
     const winners = interaction.options.getInteger("winners");
     const durationInput = interaction.options.getString("duration");
@@ -43,7 +44,7 @@ module.exports = {
 
     const durationMs = parseDuration(durationInput);
     if (!durationMs) {
-      return interaction.reply({
+      return interaction.editReply({
         content:
           "❌ Invalid duration format. Use formats like `10s`, `5m`, `2h`, `3d`, `1mo`, `1y`.",
         flags: 64,
@@ -93,7 +94,7 @@ module.exports = {
       emoji: emojiId, // ⭐ FIXED — must match reaction
     });
 
-    await interaction.reply({
+    await interaction.editReply({
       content: `✅ Giveaway started for **${prize}**! Ends <t:${endTimestamp}:R>.`,
       flags: 64,
     });

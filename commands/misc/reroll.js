@@ -1,7 +1,4 @@
-const {
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-} = require("discord.js");
+const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { loadGiveaways } = require("../../giveaway/giveawayutils");
 const embedTemplate = require("../../utils/embedTemplate");
 const path = require("node:path");
@@ -10,64 +7,78 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("reroll")
     .setDescription("Reroll a giveaway by message ID (HR only).")
-    .addStringOption(option =>
+    .addStringOption((option) =>
       option
         .setName("messageid")
         .setDescription("The message ID of the giveaway to reroll.")
-        .setRequired(true)
+        .setRequired(true),
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles),
 
   async execute(interaction) {
+    // HR role
     const hrRoleId = "1481953102654607451";
+
+    // Defer reply (prevents Unknown Interaction)
+    await interaction.deferReply({ flags: 64 });
+
+    // Permission check
     if (!interaction.member.roles.cache.has(hrRoleId)) {
-      return interaction.reply({
+      return interaction.editReply({
         content: "❌ Only HR can reroll giveaways.",
-        ephemeral: true,
       });
     }
 
     const messageId = interaction.options.getString("messageid");
     const giveaways = loadGiveaways();
-    const giveaway = giveaways.find(g => g.messageId === messageId);
+    const giveaway = giveaways.find((g) => g.messageId === messageId);
 
     if (!giveaway) {
-      return interaction.reply({
+      return interaction.editReply({
         content: "❌ Giveaway not found.",
-        ephemeral: true,
       });
     }
 
     try {
       const guild = interaction.guild;
       const channel = guild.channels.cache.get(giveaway.channelId);
-      const giveawayMessage = await channel.messages.fetch(giveaway.messageId).catch(() => null);
 
-      if (!giveawayMessage) {
-        return interaction.reply({
-          content: "❌ Giveaway message not found.",
-          ephemeral: true,
+      if (!channel) {
+        return interaction.editReply({
+          content: "❌ Giveaway channel no longer exists.",
         });
       }
 
-      await giveawayMessage.fetch(); // ensures reactions are cached
+      const giveawayMessage = await channel.messages
+        .fetch(giveaway.messageId)
+        .catch(() => null);
+      if (!giveawayMessage) {
+        return interaction.editReply({
+          content: "❌ Giveaway message not found.",
+        });
+      }
+
+      // Ensure reactions are cached
+      await giveawayMessage.fetch();
+      await giveawayMessage.reactions.resolve(giveaway.emoji)?.fetch();
+
       const reaction = giveawayMessage.reactions.cache.get(giveaway.emoji);
       if (!reaction) {
-        return interaction.reply({
+        return interaction.editReply({
           content: "❌ No reaction data found.",
-          ephemeral: true,
         });
       }
 
       const users = await reaction.users.fetch();
-      let entrants = users.filter(u => !u.bot);
+      let entrants = users.filter((u) => !u.bot);
 
+      // Apply role restrictions
       if (giveaway.roleRestrictions.length > 0) {
-        entrants = entrants.filter(u => {
+        entrants = entrants.filter((u) => {
           const member = guild.members.cache.get(u.id);
           if (!member) return false;
-          return giveaway.roleRestrictions.every(roleId =>
-            member.roles.cache.has(roleId)
+          return giveaway.roleRestrictions.every((roleId) =>
+            member.roles.cache.has(roleId),
           );
         });
       }
@@ -75,6 +86,7 @@ module.exports = {
       const entrantArray = Array.from(entrants.values());
       const winners = [];
 
+      // Pick winners
       if (entrantArray.length > 0) {
         for (let i = 0; i < giveaway.winners; i++) {
           if (entrantArray.length === 0) break;
@@ -84,13 +96,15 @@ module.exports = {
         }
       }
 
+      // Build reroll embed
       const { embed, files } = embedTemplate({
-        title: "<a:startilt:1524621292790222989> Giveaway Rerolled <a:startilt:1524621292790222989>",
+        title:
+          "<a:startilt:1524621292790222989> Giveaway Rerolled <a:startilt:1524621292790222989>",
         description:
           `> <:gvreasterisk:1524624524849582101> **Prize:** ${giveaway.prize}\n` +
           `> <:gvreasterisk:1524624524849582101> **New Winners:** ${
             winners.length > 0
-              ? winners.map(w => `<@${w.id}>`).join(", ")
+              ? winners.map((w) => `<@${w.id}>`).join(", ")
               : "No valid entrants"
           }\n\n` +
           `> <:gvreasterisk:1524624524849582101> Giveaway has been rerolled by HR.`,
@@ -98,21 +112,22 @@ module.exports = {
         color: 0x3cf65b,
       });
 
+      // Send public reroll result
       await channel.send({
-        content: winners.length > 0 ? winners.map(w => `<@${w.id}>`).join(" ") : "",
+        content:
+          winners.length > 0 ? winners.map((w) => `<@${w.id}>`).join(" ") : "",
         embeds: [embed],
         files,
       });
 
-      await interaction.reply({
+      // Ephemeral success message
+      await interaction.editReply({
         content: "🔄 Giveaway rerolled successfully.",
-        ephemeral: true,
       });
     } catch (err) {
       console.error("Reroll error:", err);
-      return interaction.reply({
+      return interaction.editReply({
         content: "❌ An error occurred while rerolling.",
-        ephemeral: true,
       });
     }
   },
