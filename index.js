@@ -68,8 +68,6 @@ const client = new Client({
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 
-require("./giveaway/giveawayhandler")(client);
-
 client.commands = new Collection();
 
 // -----------------------------------------------------
@@ -351,3 +349,4 @@ client.on(Events.InteractionCreate, async (interaction) => {
 // LOGIN
 // -----------------------------------------------------
 client.login(process.env.TOKEN);
+require("./giveaway/giveawayhandler")(client);

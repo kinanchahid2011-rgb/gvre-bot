@@ -10,7 +10,7 @@ module.exports = (client) => {
     const now = Math.floor(Date.now() / 1000);
 
     for (const g of giveaways) {
-      if (now < g.endTime) continue; // Not finished yet
+      if (now < g.endTime) continue;
 
       try {
         const guild = client.guilds.cache.get(g.guildId);
@@ -25,11 +25,17 @@ module.exports = (client) => {
           continue;
         }
 
-        const message = await channel.messages.fetch(g.messageId).catch(() => null);
+        const message = await channel.messages
+          .fetch(g.messageId)
+          .catch(() => null);
         if (!message) {
           removeGiveaway(g.messageId);
           continue;
         }
+
+        // ⭐ Fetch reaction cache
+        await message.fetch();
+        await message.reactions.resolve(g.emoji)?.fetch();
 
         const reaction = message.reactions.cache.get(g.emoji);
         if (!reaction) {
@@ -38,24 +44,21 @@ module.exports = (client) => {
         }
 
         const users = await reaction.users.fetch();
-        let entrants = users.filter(u => !u.bot);
+        let entrants = users.filter((u) => !u.bot);
 
-        // Apply role restrictions (AND logic)
         if (g.roleRestrictions.length > 0) {
-          entrants = entrants.filter(u => {
+          entrants = entrants.filter((u) => {
             const member = guild.members.cache.get(u.id);
             if (!member) return false;
-
-            return g.roleRestrictions.every(roleId =>
-              member.roles.cache.has(roleId)
+            return g.roleRestrictions.every((roleId) =>
+              member.roles.cache.has(roleId),
             );
           });
         }
 
         const entrantArray = Array.from(entrants.values());
-
-        // Pick winners
         let winners = [];
+
         if (entrantArray.length > 0) {
           for (let i = 0; i < g.winners; i++) {
             if (entrantArray.length === 0) break;
@@ -65,14 +68,14 @@ module.exports = (client) => {
           }
         }
 
-        // Build ended giveaway embed
         const { embed, files } = embedTemplate({
-          title: "<a:startilt:1524621292790222989> Giveaway Ended <a:startilt:1524621292790222989>",
+          title:
+            "<a:startilt:1524621292790222989> Giveaway Ended <a:startilt:1524621292790222989>",
           description:
             `> <:gvreasterisk:1524624524849582101> **Prize:** ${g.prize}\n` +
             `> <:gvreasterisk:1524624524849582101> **Winners:** ${
               winners.length > 0
-                ? winners.map(w => `<@${w.id}>`).join(", ")
+                ? winners.map((w) => `<@${w.id}>`).join(", ")
                 : "No valid entrants"
             }\n\n` +
             `> <:gvreasterisk:1524624524849582101> Thank you for participating!`,
@@ -81,18 +84,19 @@ module.exports = (client) => {
         });
 
         await channel.send({
-          content: winners.length > 0 ? winners.map(w => `<@${w.id}>`).join(" ") : "",
+          content:
+            winners.length > 0
+              ? winners.map((w) => `<@${w.id}>`).join(" ")
+              : "",
           embeds: [embed],
           files,
         });
 
-        // Remove giveaway from storage
         removeGiveaway(g.messageId);
-
       } catch (err) {
         console.error("Giveaway handler error:", err);
         removeGiveaway(g.messageId);
       }
     }
-  }, 60 * 1000); // Runs every minute
+  }, 60 * 1000);
 };

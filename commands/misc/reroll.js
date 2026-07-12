@@ -1,43 +1,62 @@
-const { loadGiveaways } = require("../giveaway/giveawayutils");
-const embedTemplate = require("../utils/embedTemplate"); // ✅ FIXED PATH
+const {
+  SlashCommandBuilder,
+  PermissionFlagsBits,
+} = require("discord.js");
+const { loadGiveaways } = require("../../giveaway/giveawayutils");
+const embedTemplate = require("../../utils/embedTemplate");
 const path = require("node:path");
 
 module.exports = {
-  name: "messageCreate",
+  data: new SlashCommandBuilder()
+    .setName("reroll")
+    .setDescription("Reroll a giveaway by message ID (HR only).")
+    .addStringOption(option =>
+      option
+        .setName("messageid")
+        .setDescription("The message ID of the giveaway to reroll.")
+        .setRequired(true)
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles),
 
-  async execute(message, client) {
+  async execute(interaction) {
     const hrRoleId = "1481953102654607451";
-
-    if (!message.content.startsWith("-reroll")) return;
-    if (!message.member.roles.cache.has(hrRoleId)) {
-      return message.reply("❌ Only HR can reroll giveaways.");
+    if (!interaction.member.roles.cache.has(hrRoleId)) {
+      return interaction.reply({
+        content: "❌ Only HR can reroll giveaways.",
+        ephemeral: true,
+      });
     }
 
-    const args = message.content.split(" ");
-    if (args.length < 2) {
-      return message.reply("❌ Usage: `-reroll <messageID>`");
-    }
-
-    const messageId = args[1];
+    const messageId = interaction.options.getString("messageid");
     const giveaways = loadGiveaways();
     const giveaway = giveaways.find(g => g.messageId === messageId);
 
     if (!giveaway) {
-      return message.reply("❌ Giveaway not found.");
+      return interaction.reply({
+        content: "❌ Giveaway not found.",
+        ephemeral: true,
+      });
     }
 
     try {
-      const guild = client.guilds.cache.get(giveaway.guildId);
+      const guild = interaction.guild;
       const channel = guild.channels.cache.get(giveaway.channelId);
-
       const giveawayMessage = await channel.messages.fetch(giveaway.messageId).catch(() => null);
+
       if (!giveawayMessage) {
-        return message.reply("❌ Giveaway message not found.");
+        return interaction.reply({
+          content: "❌ Giveaway message not found.",
+          ephemeral: true,
+        });
       }
 
+      await giveawayMessage.fetch(); // ensures reactions are cached
       const reaction = giveawayMessage.reactions.cache.get(giveaway.emoji);
       if (!reaction) {
-        return message.reply("❌ No reaction data found.");
+        return interaction.reply({
+          content: "❌ No reaction data found.",
+          ephemeral: true,
+        });
       }
 
       const users = await reaction.users.fetch();
@@ -85,10 +104,16 @@ module.exports = {
         files,
       });
 
-      await message.reply("🔄 Giveaway rerolled successfully.");
+      await interaction.reply({
+        content: "🔄 Giveaway rerolled successfully.",
+        ephemeral: true,
+      });
     } catch (err) {
       console.error("Reroll error:", err);
-      return message.reply("❌ An error occurred while rerolling.");
+      return interaction.reply({
+        content: "❌ An error occurred while rerolling.",
+        ephemeral: true,
+      });
     }
   },
 };

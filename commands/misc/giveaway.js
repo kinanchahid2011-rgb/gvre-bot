@@ -1,7 +1,4 @@
-const {
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-} = require("discord.js");
+const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const path = require("node:path");
 const embedTemplate = require("../../utils/embedTemplate");
 const { parseDuration, saveGiveaway } = require("../../giveaway/giveawayutils");
@@ -14,25 +11,25 @@ module.exports = {
       option
         .setName("prize")
         .setDescription("The prize for the giveaway.")
-        .setRequired(true)
+        .setRequired(true),
     )
     .addIntegerOption((option) =>
       option
         .setName("winners")
         .setDescription("Number of winners.")
-        .setRequired(true)
+        .setRequired(true),
     )
     .addStringOption((option) =>
       option
         .setName("duration")
         .setDescription("Duration (e.g. 10s, 5m, 2h, 3d, 1mo, 1y).")
-        .setRequired(true)
+        .setRequired(true),
     )
     .addRoleOption((option) =>
       option
         .setName("roles")
-        .setDescription("Role restrictions (select multiple).")
-        .setRequired(false)
+        .setDescription("Role restrictions (optional).")
+        .setRequired(false),
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles),
 
@@ -47,8 +44,9 @@ module.exports = {
     const durationMs = parseDuration(durationInput);
     if (!durationMs) {
       return interaction.reply({
-        content: "❌ Invalid duration format. Use formats like `10s`, `5m`, `2h`, `3d`, `1mo`, `1y`.",
-        flags: 64,
+        content:
+          "❌ Invalid duration format. Use formats like `10s`, `5m`, `2h`, `3d`, `1mo`, `1y`.",
+        ephemeral: true,
       });
     }
 
@@ -57,13 +55,14 @@ module.exports = {
 
     // Create giveaway embed
     const { embed, files } = embedTemplate({
-      title: "<a:startilt:1524621292790222989> GVRE Giveaway <a:startilt:1524621292790222989>",
+      title:
+        "<a:startilt:1524621292790222989> GVRE Giveaway <a:startilt:1524621292790222989>",
       description:
         `> <:gvreasterisk:1524624524849582101> **Prize:** ${prize}\n` +
         `> <:gvreasterisk:1524624524849582101> **Winners:** ${winners}\n` +
         `> <:gvreasterisk:1524624524849582101> **Ends:** <t:${endTimestamp}:R> (<t:${endTimestamp}:F>)\n` +
         (roleRestrictions.length
-          ? `> <:arrowright:1523736161770672209> **Role Restrictions:** ${roleRestrictions.map(r => `<@&${r}>`).join(", ")}`
+          ? `> <:arrowright:1523736161770672209> **Role Restrictions:** ${roleRestrictions.map((r) => `<@&${r}>`).join(", ")}`
           : "") +
         `\n\n> React with <a:startilt:1524621292790222989> to enter!`,
       banner: path.join(__dirname, "../../graphics/gvregiveaway.png"),
@@ -78,7 +77,9 @@ module.exports = {
       files,
     });
 
-    await msg.react("1524621292790222989");
+    // React with the custom emoji ID
+    const emojiId = "1524621292790222989";
+    await msg.react(emojiId);
 
     // Save giveaway data for handler
     await saveGiveaway({
@@ -89,12 +90,12 @@ module.exports = {
       winners,
       endTime: endTimestamp,
       roleRestrictions,
-      emoji: "🎉",
+      emoji: emojiId, // ⭐ FIXED — must match reaction
     });
 
     await interaction.reply({
       content: `✅ Giveaway started for **${prize}**! Ends <t:${endTimestamp}:R>.`,
-      flags: 64,
+      ephemeral: true,
     });
   },
 };
