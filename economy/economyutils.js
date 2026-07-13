@@ -1,60 +1,77 @@
-const fs = require("node:fs");
-const path = require("node:path");
+const axios = require("axios");
 
-// File locations
-const econFile = path.join(__dirname, "../data/economy.json");
-const roleIncomeFile = path.join(__dirname, "../data/roleIncome.json");
+// JSONBin setup
+const BIN_ID = process.env.JSONBIN_BIN_ID;
+const API_KEY = process.env.JSONBIN_API_KEY;
+const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-// Ensures a file exists, creates it if missing
-function ensureFile(file, defaultData) {
-  if (!fs.existsSync(file)) {
-    fs.writeFileSync(file, JSON.stringify(defaultData, null, 2));
+// Load economy data from JSONBin
+async function loadEconomy() {
+  try {
+    const res = await axios.get(BASE_URL, {
+      headers: { "X-Master-Key": API_KEY },
+    });
+    return res.data.record.economy || [];
+  } catch (err) {
+    console.error("Error loading economy:", err);
+    return [];
   }
 }
 
-// Load economy.json
-function loadEconomy() {
-  ensureFile(econFile, []);
-  return JSON.parse(fs.readFileSync(econFile, "utf8"));
+// Save economy data to JSONBin
+async function saveEconomy(data) {
+  try {
+    await axios.put(
+      BASE_URL,
+      { economy: data },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-Master-Key": API_KEY,
+        },
+      },
+    );
+  } catch (err) {
+    console.error("Error saving economy:", err);
+  }
 }
 
-// Save economy.json
-function saveEconomy(data) {
-  fs.writeFileSync(econFile, JSON.stringify(data, null, 2));
-}
-
-// Load roleIncome.json
-function loadRoleIncome() {
-  ensureFile(roleIncomeFile, {});
-  return JSON.parse(fs.readFileSync(roleIncomeFile, "utf8"));
+// Load role income (optional)
+async function loadRoleIncome() {
+  try {
+    const res = await axios.get(BASE_URL, {
+      headers: { "X-Master-Key": API_KEY },
+    });
+    return res.data.record.roleIncome || {};
+  } catch (err) {
+    console.error("Error loading role income:", err);
+    return {};
+  }
 }
 
 // Get or create a user record
-function getUserRecord(userId) {
-  const econ = loadEconomy();
-  let user = econ.find(u => u.userId === userId);
+async function getUserRecord(userId) {
+  const econ = await loadEconomy();
+  let user = econ.find((u) => u.userId === userId);
 
   if (!user) {
     user = { userId, cash: 0, lastCollect: 0 };
     econ.push(user);
-    saveEconomy(econ);
+    await saveEconomy(econ);
   }
 
   return user;
 }
 
 // Update a user record
-function updateUserRecord(user) {
-  const econ = loadEconomy();
-  const index = econ.findIndex(u => u.userId === user.userId);
+async function updateUserRecord(user) {
+  const econ = await loadEconomy();
+  const index = econ.findIndex((u) => u.userId === user.userId);
 
-  if (index === -1) {
-    econ.push(user);
-  } else {
-    econ[index] = user;
-  }
+  if (index === -1) econ.push(user);
+  else econ[index] = user;
 
-  saveEconomy(econ);
+  await saveEconomy(econ);
 }
 
 module.exports = {
