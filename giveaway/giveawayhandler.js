@@ -1,4 +1,4 @@
-const { loadGiveaways } = require("./giveawayutils");
+const { loadGiveaways, saveGiveaways } = require("./giveawayutils");
 const embedTemplate = require("../utils/embedTemplate");
 const path = require("node:path");
 
@@ -10,7 +10,8 @@ module.exports = (client) => {
     const now = Math.floor(Date.now() / 1000);
 
     for (const g of giveaways) {
-      if (now < g.endTime) continue;
+      // Skip giveaways that haven't ended or are already marked ended
+      if (now < g.endTime || g.ended) continue;
 
       try {
         const guild = client.guilds.cache.get(g.guildId);
@@ -24,6 +25,7 @@ module.exports = (client) => {
           .catch(() => null);
         if (!message) continue;
 
+        // Fetch reaction cache
         await message.fetch();
         await message.reactions.resolve(g.emoji)?.fetch();
 
@@ -33,6 +35,7 @@ module.exports = (client) => {
         const users = await reaction.users.fetch();
         let entrants = users.filter((u) => !u.bot);
 
+        // Apply role restrictions
         if (g.roleRestrictions.length > 0) {
           entrants = entrants.filter((u) => {
             const member = guild.members.cache.get(u.id);
@@ -44,7 +47,7 @@ module.exports = (client) => {
         }
 
         const entrantArray = Array.from(entrants.values());
-        let winners = [];
+        const winners = [];
 
         if (entrantArray.length > 0) {
           for (let i = 0; i < g.winners; i++) {
@@ -55,6 +58,7 @@ module.exports = (client) => {
           }
         }
 
+        // Build "Giveaway Ended" embed
         const { embed, files } = embedTemplate({
           title:
             "<a:startilt:1524621292790222989> Giveaway Ended <a:startilt:1524621292790222989>",
@@ -79,11 +83,18 @@ module.exports = (client) => {
           files,
         });
 
-        // ❗ DO NOT REMOVE GIVEAWAY
-        // reroll needs it to stay in JSON
+        // ✅ Mark giveaway as ended (so it won't repeat)
+        const allGiveaways = loadGiveaways();
+        const index = allGiveaways.findIndex(
+          (x) => x.messageId === g.messageId,
+        );
+        if (index !== -1) {
+          allGiveaways[index].ended = true;
+          saveGiveaways(allGiveaways);
+        }
       } catch (err) {
         console.error("Giveaway handler error:", err);
       }
     }
-  }, 5 * 1000);
+  }, 5 * 1000); // checks every 5 seconds
 };
