@@ -18,14 +18,15 @@ module.exports = {
     const member = interaction.member;
     const userId = interaction.user.id;
 
-    // JSONBin → async
     const roleIncome = await loadRoleIncome();
     const user = await getUserRecord(userId);
 
-    // Convert timestamps properly
-    const now = Date.now(); // ms
-    const cooldownMs = 60 * 60 * 1000; // 1 hour in ms
+    const now = Date.now();
+    const cooldownMs = 60 * 60 * 1000; // 1 hour
 
+    // -----------------------------------------------------
+    // COOLDOWN → EPHEMERAL
+    // -----------------------------------------------------
     if (user.lastCollect && now - user.lastCollect < cooldownMs) {
       const remaining = cooldownMs - (now - user.lastCollect);
 
@@ -38,11 +39,13 @@ module.exports = {
       return interaction.editReply({
         embeds: [embed],
         files,
-        flags: 64,
+        flags: 64, // ephemeral
       });
     }
 
-    // Calculate total income based on roles
+    // -----------------------------------------------------
+    // CALCULATE INCOME
+    // -----------------------------------------------------
     let totalIncome = 0;
     const earnedFrom = [];
 
@@ -53,19 +56,23 @@ module.exports = {
       }
     }
 
+    // -----------------------------------------------------
+    // NO INCOME ROLES → EPHEMERAL
+    // -----------------------------------------------------
     if (totalIncome === 0) {
       return interaction.editReply({
         content: "❌ You don't have any income-eligible roles.",
-        flags: 64,
+        flags: 64, // ephemeral
       });
     }
 
-    // Update user balance
+    // -----------------------------------------------------
+    // SUCCESSFUL COLLECT → PUBLIC
+    // -----------------------------------------------------
     user.cash = (user.cash ?? 0) + totalIncome;
     user.lastCollect = now;
-    await updateUserRecord(user); // async
+    await updateUserRecord(user);
 
-    // Build embed description
     let desc = "";
     desc += `> <:gvreasterisk:1524624524849582101> **Total Collected:** $${totalIncome}\n`;
     desc += `> <:gvreasterisk:1524624524849582101> **New Balance:** $${user.cash}\n\n`;
@@ -85,7 +92,7 @@ module.exports = {
       color: 0x3cf65b,
     });
 
-    await interaction.editReply({
+    return interaction.editReply({
       embeds: [embed],
       files,
     });
