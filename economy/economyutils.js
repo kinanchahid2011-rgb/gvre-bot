@@ -1,10 +1,17 @@
 const { MongoClient } = require("mongodb");
 require("dotenv").config();
 
+// MongoDB connection URI from .env
 const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri);
 
-// Connect to DB (reuses connection)
+// Create client with TLS options for Render compatibility
+const client = new MongoClient(uri, {
+  ssl: true,
+  tlsAllowInvalidCertificates: false,
+  serverSelectionTimeoutMS: 5000,
+});
+
+// Reuse connection across calls
 async function getDB() {
   if (!client.topology || !client.topology.isConnected()) {
     await client.connect();
@@ -12,13 +19,13 @@ async function getDB() {
   return client.db("economy");
 }
 
-// Load ALL users (for leaderboard, economyinfo)
+// Load all users (for leaderboard, economyinfo)
 async function loadEconomy() {
   const db = await getDB();
   return await db.collection("users").find().toArray();
 }
 
-// Load role income
+// Load role income data
 async function loadRoleIncome() {
   const db = await getDB();
   const doc = await db.collection("roleIncome").findOne({ _id: "roleIncome" });
