@@ -9,7 +9,7 @@ module.exports = {
     .setDescription("Check your current cash balance."),
 
   async execute(interaction) {
-    await interaction.deferReply({ flags: 64 });
+    await interaction.deferReply();
 
     const userId = interaction.user.id;
     const user = getUserRecord(userId);
@@ -33,7 +33,6 @@ module.exports = {
     await interaction.editReply({
       embeds: [embed],
       files,
-      flags: 64,
     });
   },
 };

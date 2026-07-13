@@ -14,7 +14,7 @@ module.exports = {
     .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages),
 
   async execute(interaction) {
-    await interaction.deferReply({ flags: 64 });
+    await interaction.deferReply();
 
     const member = interaction.member;
     const userId = interaction.user.id;
@@ -79,7 +79,6 @@ module.exports = {
     await interaction.editReply({
       embeds: [embed],
       files,
-      flags: 64,
     });
   },
 };

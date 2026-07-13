@@ -11,28 +11,32 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("ecoremove")
     .setDescription("HR: Remove money from a user's balance.")
-    .addUserOption(option =>
+    .addUserOption((option) =>
       option
         .setName("user")
         .setDescription("The user to remove money from.")
-        .setRequired(true)
+        .setRequired(true),
     )
-    .addIntegerOption(option =>
+    .addIntegerOption((option) =>
       option
         .setName("amount")
         .setDescription("Amount of money to remove.")
-        .setRequired(true)
+        .setRequired(true),
     ),
 
   async execute(interaction) {
-    await interaction.deferReply({ flags: 64 });
+    await interaction.deferReply();
 
     // HR role check
     if (!interaction.member.roles.cache.has(HR_ROLE_ID)) {
-      return interaction.editReply({
-        content: "❌ Only HR staff can use this command.",
-        flags: 64,
+      const { embed } = embedTemplate({
+        title:
+          "<:shines:1524097104547680276> Access Denied <:shines:1524097104547680276>",
+        description:
+          "> <:bulletpoint:1524621721318195230> Only HR staff can use this command.",
+        color: 0xff4d4d,
       });
+      return interaction.editReply({ embeds: [embed] });
     }
 
     const hrMember = interaction.member;
@@ -40,19 +44,27 @@ module.exports = {
     const amount = interaction.options.getInteger("amount");
 
     if (amount <= 0) {
-      return interaction.editReply({
-        content: "❌ Amount must be greater than 0.",
-        flags: 64,
+      const { embed } = embedTemplate({
+        title:
+          "<:shines:1524097104547680276> Invalid Amount <:shines:1524097104547680276>",
+        description:
+          "> <:bulletpoint:1524621721318195230> Amount must be greater than 0.",
+        color: 0xff4d4d,
       });
+      return interaction.editReply({ embeds: [embed] });
     }
 
     const receiverRecord = getUserRecord(receiver.id);
 
     if (receiverRecord.cash < amount) {
-      return interaction.editReply({
-        content: "❌ That user does not have enough money.",
-        flags: 64,
+      const { embed } = embedTemplate({
+        title:
+          "<:shines:1524097104547680276> Insufficient Funds <:shines:1524097104547680276>",
+        description:
+          "> <:bulletpoint:1524621721318195230> That user does not have enough money.",
+        color: 0xff4d4d,
       });
+      return interaction.editReply({ embeds: [embed] });
     }
 
     // Remove money
@@ -61,31 +73,32 @@ module.exports = {
 
     // HR confirmation embed
     const desc =
-      `> <:shines:1524097104547680276> **Removed from:** <@${receiver.id}>\n` +
-      `> <:shines:1524097104547680276> **Amount:** $${amount}\n` +
-      `> <:shines:1524097104547680276> **New Balance:** $${receiverRecord.cash}`;
+      `> <:bulletpoint:1524621721318195230> **Removed from:** <@${receiver.id}>\n` +
+      `> <:bulletpoint:1524621721318195230> **Amount:** $${amount}\n` +
+      `> <:bulletpoint:1524621721318195230> **New Balance:** $${receiverRecord.cash}`;
 
     const { embed } = embedTemplate({
-      title: "<:shines:1524097104547680276> Money Removed <:shines:1524097104547680276>",
+      title:
+        "<:shines:1524097104547680276> Money Removed <:shines:1524097104547680276>",
       description: desc,
       thumbnail: receiver.displayAvatarURL({ dynamic: true }),
-      color: 0xff4d4d, // red tone for removal
+      color: 0xff4d4d,
     });
 
-    await interaction.editReply({
-      embeds: [embed],
-      flags: 64,
-    });
+    await interaction.editReply({ embeds: [embed] });
 
-    // DM the user
+    // DM the user with embed
     try {
-      await receiver.send({
-        content:
-          `⚠️ **Money Removed From Your Account**\n` +
-          `> <:shines:1524097104547680276> **By:** ${hrMember.user.username} (HR)\n` +
-          `> <:shines:1524097104547680276> **Amount Removed:** $${amount}\n` +
-          `> <:shines:1524097104547680276> **New Balance:** $${receiverRecord.cash}`,
+      const { embed: dmEmbed } = embedTemplate({
+        title:
+          "<:shines:1524097104547680276> Money Removed <:shines:1524097104547680276>",
+        description:
+          `> <:bulletpoint:1524621721318195230> **By:** ${hrMember.user.username} (HR)\n` +
+          `> <:bulletpoint:1524621721318195230> **Amount Removed:** $${amount}\n` +
+          `> <:bulletpoint:1524621721318195230> **New Balance:** $${receiverRecord.cash}`,
+        color: 0xff4d4d,
       });
+      await receiver.send({ embeds: [dmEmbed] });
     } catch {
       // Ignore if DMs are closed
     }

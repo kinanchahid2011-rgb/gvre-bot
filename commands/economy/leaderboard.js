@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
 const embedTemplate = require("../../utils/embedTemplate");
-const path = require("node:path");
 const { loadEconomy } = require("../../economy/economyutils");
 
 module.exports = {
@@ -9,15 +8,19 @@ module.exports = {
     .setDescription("View the top richest players."),
 
   async execute(interaction) {
-    await interaction.deferReply({ flags: 64 });
+    await interaction.deferReply();
 
     const economy = loadEconomy();
 
     if (!economy.length) {
-      return interaction.editReply({
-        content: "📉 No economy data found.",
-        flags: 64,
+      const { embed } = embedTemplate({
+        title:
+          "<:shines:1524097104547680276> Economy Leaderboard <:shines:1524097104547680276>",
+        description:
+          "> <:bulletpoint:1524621721318195230> No economy data found.",
+        color: 0xff4d4d,
       });
+      return interaction.editReply({ embeds: [embed] });
     }
 
     // Sort by cash descending
@@ -30,13 +33,16 @@ module.exports = {
 
     top.forEach((user, index) => {
       const member = interaction.guild.members.cache.get(user.userId);
-      const name = member ? member.user.username : `Unknown User (${user.userId})`;
+      const name = member
+        ? member.user.username
+        : `Unknown User (${user.userId})`;
 
-      desc += `> **#${index + 1}** — ${name}: $${user.cash}\n`;
+      desc += `> <:bulletpoint:1524621721318195230> **#${index + 1}** — ${name}: $${user.cash}\n`;
     });
 
     const { embed } = embedTemplate({
-      title: "<:shines:1524097104547680276> Economy Leaderboard <:shines:1524097104547680276>",
+      title:
+        "<:shines:1524097104547680276> Economy Leaderboard <:shines:1524097104547680276>",
       description: desc,
       color: 0x3cf65b,
       thumbnail: interaction.guild.iconURL({ dynamic: true }),
@@ -44,7 +50,6 @@ module.exports = {
 
     await interaction.editReply({
       embeds: [embed],
-      flags: 64,
     });
   },
 };
