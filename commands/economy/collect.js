@@ -28,8 +28,16 @@ module.exports = {
 
     if (user.lastCollect && now - user.lastCollect < cooldownMs) {
       const remaining = cooldownMs - (now - user.lastCollect);
+
+      const { embed, files } = embedTemplate({
+        title: "⏳ Cooldown Active",
+        description: `You already collected.\nTry again <t:${Math.floor((now + remaining) / 1000)}:R>.`,
+        color: 0xffcc00,
+      });
+
       return interaction.editReply({
-        content: `⏳ You already collected. Try again <t:${Math.floor((now + remaining) / 1000)}:R>.`,
+        embeds: [embed],
+        files,
         flags: 64,
       });
     }
