@@ -16,21 +16,21 @@ module.exports = {
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles),
 
   async execute(interaction) {
-    const hrRoleId = "1481953102654607451";
+    const hrRoleId = "1481953102654607451"; // your HR role ID
 
-    // Prevent Unknown Interaction
     await interaction.deferReply({ flags: 64 });
 
+    // Permission check
     if (!interaction.member.roles.cache.has(hrRoleId)) {
       return interaction.editReply("❌ Only HR can reroll giveaways.");
     }
 
     const messageId = interaction.options.getString("messageid");
-    const giveaways = loadGiveaways();
+    const giveaways = loadEndedGiveaways();
     const giveaway = giveaways.find((g) => g.messageId === messageId);
 
     if (!giveaway) {
-      return interaction.editReply("❌ Giveaway not found.");
+      return interaction.editReply("❌ Giveaway not found in ended giveaways.");
     }
 
     try {
@@ -48,7 +48,6 @@ module.exports = {
         return interaction.editReply("❌ Giveaway message not found.");
       }
 
-      // Ensure reactions are cached
       await giveawayMessage.fetch();
       await giveawayMessage.reactions.resolve(giveaway.emoji)?.fetch();
 
@@ -60,7 +59,6 @@ module.exports = {
       const users = await reaction.users.fetch();
       let entrants = users.filter((u) => !u.bot);
 
-      // Apply role restrictions
       if (giveaway.roleRestrictions.length > 0) {
         entrants = entrants.filter((u) => {
           const member = guild.members.cache.get(u.id);
@@ -74,7 +72,6 @@ module.exports = {
       const entrantArray = Array.from(entrants.values());
       const winners = [];
 
-      // Pick winners
       if (entrantArray.length > 0) {
         for (let i = 0; i < giveaway.winners; i++) {
           if (entrantArray.length === 0) break;
@@ -100,7 +97,6 @@ module.exports = {
         color: 0x3cf65b,
       });
 
-      // Public reroll announcement
       await channel.send({
         content:
           winners.length > 0 ? winners.map((w) => `<@${w.id}>`).join(" ") : "",
@@ -108,7 +104,6 @@ module.exports = {
         files,
       });
 
-      // Ephemeral success
       await interaction.editReply("🔄 Giveaway rerolled successfully.");
     } catch (err) {
       console.error("Reroll error:", err);
