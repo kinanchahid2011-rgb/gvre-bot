@@ -1,4 +1,4 @@
-const { loadGiveaways, removeGiveaway } = require("./giveawayutils");
+const { loadGiveaways } = require("./giveawayutils");
 const embedTemplate = require("../utils/embedTemplate");
 const path = require("node:path");
 
@@ -14,34 +14,21 @@ module.exports = (client) => {
 
       try {
         const guild = client.guilds.cache.get(g.guildId);
-        if (!guild) {
-          removeGiveaway(g.messageId);
-          continue;
-        }
+        if (!guild) continue;
 
         const channel = guild.channels.cache.get(g.channelId);
-        if (!channel) {
-          removeGiveaway(g.messageId);
-          continue;
-        }
+        if (!channel) continue;
 
         const message = await channel.messages
           .fetch(g.messageId)
           .catch(() => null);
-        if (!message) {
-          removeGiveaway(g.messageId);
-          continue;
-        }
+        if (!message) continue;
 
-        // ⭐ Fetch reaction cache
         await message.fetch();
         await message.reactions.resolve(g.emoji)?.fetch();
 
         const reaction = message.reactions.cache.get(g.emoji);
-        if (!reaction) {
-          removeGiveaway(g.messageId);
-          continue;
-        }
+        if (!reaction) continue;
 
         const users = await reaction.users.fetch();
         let entrants = users.filter((u) => !u.bot);
@@ -92,10 +79,10 @@ module.exports = (client) => {
           files,
         });
 
-        removeGiveaway(g.messageId);
+        // ❗ DO NOT REMOVE GIVEAWAY
+        // reroll needs it to stay in JSON
       } catch (err) {
         console.error("Giveaway handler error:", err);
-        removeGiveaway(g.messageId);
       }
     }
   }, 5 * 1000);
