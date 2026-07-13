@@ -4,6 +4,7 @@ const {
   updateUserRecord,
   loadWorkMessages,
 } = require("../../economy/economyutils");
+const embedTemplate = require("../../utils/embedTemplate");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -21,10 +22,13 @@ module.exports = {
       const remaining = cooldown - (now - user.lastWork);
       const minutes = Math.ceil(remaining / 60000);
 
-      return interaction.reply({
-        content: `⏳ You must wait **${minutes} minutes** before working again.`,
-        ephemeral: true,
+      const { embed, files } = embedTemplate({
+        title: "⏳ Cooldown Active",
+        description: `You must wait **${minutes} minutes** before working again.`,
+        color: 0xffcc00,
       });
+
+      return interaction.reply({ embeds: [embed], files, ephemeral: true });
     }
 
     const workMessages = await loadWorkMessages();
@@ -32,7 +36,6 @@ module.exports = {
     const randomKey = keys[Math.floor(Math.random() * keys.length)];
     const message = workMessages[randomKey];
 
-    // Extract pay amount from message (e.g., "$500")
     const payMatch = message.match(/\$(\d+)/);
     const pay = payMatch ? parseInt(payMatch[1]) : 0;
 
@@ -41,8 +44,12 @@ module.exports = {
 
     await updateUserRecord(user);
 
-    return interaction.reply(
-      `💼 ${message}\n\nYou now have **$${user.cash}**.`,
-    );
+    const { embed, files } = embedTemplate({
+      title: "💼 Work Complete",
+      description: `${message}\n\n**New Balance:** $${user.cash}`,
+      color: 0x3cf65b,
+    });
+
+    return interaction.reply({ embeds: [embed], files });
   },
 };
