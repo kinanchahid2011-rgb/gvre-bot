@@ -34,7 +34,6 @@ module.exports = {
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles),
 
   async execute(interaction) {
-    // Prevent “Unknown interaction”
     await interaction.deferReply({ flags: 64 });
 
     const prize = interaction.options.getString("prize");
@@ -56,35 +55,41 @@ module.exports = {
     const endTimestamp = Math.floor((Date.now() + durationMs) / 1000);
     const channel = interaction.channel;
 
-    // Build embed
+    /* ---------------------- CLEAN DESCRIPTION BUILDER ---------------------- */
+
+    let desc = "";
+    desc += `> <:gvreasterisk:1524624524849582101> **Prize:** ${prize}\n`;
+    desc += `> <:gvreasterisk:1524624524849582101> **Winners:** ${winners}\n`;
+    desc += `> <:gvreasterisk:1524624524849582101> **Ends:** <t:${endTimestamp}:R> (<t:${endTimestamp}:F>)\n`;
+
+    if (roleRestrictions.length > 0) {
+      desc += `> <:gvreasterisk:1524624524849582101> **Role Restrictions:** ${roleRestrictions
+        .map((r) => `<@&${r}>`)
+        .join(", ")}\n`;
+    }
+
+    desc += `\n> React with <a:startilt:1524621292790222989> to enter!`;
+
+    /* ---------------------------------------------------------------------- */
+
     const { embed, files } = embedTemplate({
       title:
         "<a:startilt:1524621292790222989> GVRE Giveaway <a:startilt:1524621292790222989>",
-      description:
-        `> <:gvreasterisk:1524624524849582101> **Prize:** ${prize}\n` +
-        `> <:gvreasterisk:1524624524849582101> **Winners:** ${winners}\n` +
-        `> <:gvreasterisk:1524624524849582101> **Ends:** <t:${endTimestamp}:R> (<t:${endTimestamp}:F>)\n` +
-        (roleRestrictions.length
-          ? `> <:gvreasterisk:1524624524849582101> **Role Restrictions:** ${roleRestrictions.map((r) => `<@&${r}>`).join(", ")}`
-          : "") +
-        `\n\n> React with <a:startilt:1524621292790222989> to enter!`,
+      description: desc,
       banner: path.join(__dirname, "../../graphics/gvregiveaway.png"),
       thumbnail: interaction.user.displayAvatarURL({ dynamic: true }),
       color: 0x3cf65b,
     });
 
-    // Send giveaway message
     const msg = await channel.send({
       content: "@everyone",
       embeds: [embed],
       files,
     });
 
-    // React with custom emoji ID
     const emojiId = "1524621292790222989";
     await msg.react(emojiId);
 
-    // Save giveaway
     await saveGiveaway({
       messageId: msg.id,
       channelId: channel.id,
