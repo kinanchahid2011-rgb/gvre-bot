@@ -32,13 +32,22 @@ async function loadRoleIncome() {
   return doc?.data || {};
 }
 
+// Load work messages
+async function loadWorkMessages() {
+  const db = await getDB();
+  const doc = await db
+    .collection("workMessages")
+    .findOne({ _id: "workMessages" });
+  return doc?.data || {};
+}
+
 // Get or create a user record
 async function getUserRecord(userId) {
   const db = await getDB();
   let user = await db.collection("users").findOne({ userId });
 
   if (!user) {
-    user = { userId, cash: 0, lastCollect: 0 };
+    user = { userId, cash: 0, lastCollect: 0, lastWork: 0 };
     await db.collection("users").insertOne(user);
   }
 
@@ -56,6 +65,7 @@ async function updateUserRecord(user) {
 module.exports = {
   loadEconomy,
   loadRoleIncome,
+  loadWorkMessages,
   getUserRecord,
   updateUserRecord,
 };
