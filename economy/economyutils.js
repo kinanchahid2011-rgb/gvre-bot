@@ -1,63 +1,38 @@
-const axios = require("axios");
+const { MongoClient } = require("mongodb");
+require("dotenv").config();
 
-// JSONBin setup
-const BIN_ID = process.env.JSONBIN_BIN_ID;
-const API_KEY = process.env.JSONBIN_API_KEY;
-const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+const uri = process.env.MONGO_URI;
+const client = new MongoClient(uri);
 
-// Load economy data from JSONBin
+// Connect to DB (reuses connection)
+async function getDB() {
+  if (!client.topology || !client.topology.isConnected()) {
+    await client.connect();
+  }
+  return client.db("economy");
+}
+
+// Load ALL users (for leaderboard, economyinfo)
 async function loadEconomy() {
-  try {
-    const res = await axios.get(BASE_URL, {
-      headers: { "X-Master-Key": API_KEY },
-    });
-    return res.data.record.economy || [];
-  } catch (err) {
-    console.error("Error loading economy:", err);
-    return [];
-  }
+  const db = await getDB();
+  return await db.collection("users").find().toArray();
 }
 
-// Save economy data to JSONBin
-async function saveEconomy(data) {
-  try {
-    await axios.put(
-      BASE_URL,
-      { economy: data },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "X-Master-Key": API_KEY,
-        },
-      },
-    );
-  } catch (err) {
-    console.error("Error saving economy:", err);
-  }
-}
-
-// Load role income (optional)
+// Load role income
 async function loadRoleIncome() {
-  try {
-    const res = await axios.get(BASE_URL, {
-      headers: { "X-Master-Key": API_KEY },
-    });
-    return res.data.record.roleIncome || {};
-  } catch (err) {
-    console.error("Error loading role income:", err);
-    return {};
-  }
+  const db = await getDB();
+  const doc = await db.collection("roleIncome").findOne({ _id: "roleIncome" });
+  return doc?.data || {};
 }
 
 // Get or create a user record
 async function getUserRecord(userId) {
-  const econ = await loadEconomy();
-  let user = econ.find((u) => u.userId === userId);
+  const db = await getDB();
+  let user = await db.collection("users").findOne({ userId });
 
   if (!user) {
     user = { userId, cash: 0, lastCollect: 0 };
-    econ.push(user);
-    await saveEconomy(econ);
+    await db.collection("users").insertOne(user);
   }
 
   return user;
@@ -65,18 +40,14 @@ async function getUserRecord(userId) {
 
 // Update a user record
 async function updateUserRecord(user) {
-  const econ = await loadEconomy();
-  const index = econ.findIndex((u) => u.userId === user.userId);
-
-  if (index === -1) econ.push(user);
-  else econ[index] = user;
-
-  await saveEconomy(econ);
+  const db = await getDB();
+  await db
+    .collection("users")
+    .updateOne({ userId: user.userId }, { $set: user }, { upsert: true });
 }
 
 module.exports = {
   loadEconomy,
-  saveEconomy,
   loadRoleIncome,
   getUserRecord,
   updateUserRecord,
