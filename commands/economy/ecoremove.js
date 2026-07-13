@@ -54,7 +54,11 @@ module.exports = {
       return interaction.editReply({ embeds: [embed] });
     }
 
-    const receiverRecord = getUserRecord(receiver.id);
+    // JSONBin → async
+    const receiverRecord = await getUserRecord(receiver.id);
+
+    // Safety default
+    receiverRecord.cash = receiverRecord.cash ?? 0;
 
     if (receiverRecord.cash < amount) {
       const { embed } = embedTemplate({
@@ -69,7 +73,7 @@ module.exports = {
 
     // Remove money
     receiverRecord.cash -= amount;
-    updateUserRecord(receiverRecord);
+    await updateUserRecord(receiverRecord);
 
     // HR confirmation embed
     const desc =

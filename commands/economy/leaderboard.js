@@ -10,7 +10,8 @@ module.exports = {
   async execute(interaction) {
     await interaction.deferReply();
 
-    const economy = loadEconomy();
+    // JSONBin → async
+    const economy = await loadEconomy();
 
     if (!economy.length) {
       const { embed } = embedTemplate({
@@ -23,8 +24,8 @@ module.exports = {
       return interaction.editReply({ embeds: [embed] });
     }
 
-    // Sort by cash descending
-    const sorted = economy.sort((a, b) => b.cash - a.cash);
+    // Sort by cash descending (safe default)
+    const sorted = economy.sort((a, b) => (b.cash ?? 0) - (a.cash ?? 0));
 
     // Top 10
     const top = sorted.slice(0, 10);
@@ -37,7 +38,7 @@ module.exports = {
         ? member.user.username
         : `Unknown User (${user.userId})`;
 
-      desc += `> <:bulletpoint:1524621721318195230> **#${index + 1}** — ${name}: $${user.cash}\n`;
+      desc += `> <:bulletpoint:1524621721318195230> **#${index + 1}** — ${name}: $${user.cash ?? 0}\n`;
     });
 
     const { embed } = embedTemplate({

@@ -40,8 +40,13 @@ module.exports = {
       return interaction.editReply({ embeds: [embed] });
     }
 
-    const sender = getUserRecord(senderId);
-    const receiverRecord = getUserRecord(receiver.id);
+    // JSONBin → async
+    const sender = await getUserRecord(senderId);
+    const receiverRecord = await getUserRecord(receiver.id);
+
+    // Safety defaults
+    sender.cash = sender.cash ?? 0;
+    receiverRecord.cash = receiverRecord.cash ?? 0;
 
     // Determine amount
     let amount;
@@ -88,8 +93,8 @@ module.exports = {
     sender.cash -= amount;
     receiverRecord.cash += amount;
 
-    updateUserRecord(sender);
-    updateUserRecord(receiverRecord);
+    await updateUserRecord(sender);
+    await updateUserRecord(receiverRecord);
 
     // Sender embed
     const desc =

@@ -1,5 +1,4 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const path = require("node:path");
 const embedTemplate = require("../../utils/embedTemplate");
 const {
   loadRoleIncome,
@@ -19,17 +18,18 @@ module.exports = {
     const member = interaction.member;
     const userId = interaction.user.id;
 
-    const roleIncome = loadRoleIncome();
-    const user = getUserRecord(userId);
+    // JSONBin → async
+    const roleIncome = await loadRoleIncome();
+    const user = await getUserRecord(userId);
 
-    // Optional cooldown (once per day)
-    const now = Math.floor(Date.now() / 1000);
-    const cooldownSeconds = 60 * 60;
+    // Convert timestamps properly
+    const now = Date.now(); // ms
+    const cooldownMs = 60 * 60 * 1000; // 1 hour in ms
 
-    if (user.lastCollect && now - user.lastCollect < cooldownSeconds) {
-      const remaining = cooldownSeconds - (now - user.lastCollect);
+    if (user.lastCollect && now - user.lastCollect < cooldownMs) {
+      const remaining = cooldownMs - (now - user.lastCollect);
       return interaction.editReply({
-        content: `⏳ You already collected. Try again <t:${now + remaining}:R>.`,
+        content: `⏳ You already collected. Try again <t:${Math.floor((now + remaining) / 1000)}:R>.`,
         flags: 64,
       });
     }
@@ -53,9 +53,9 @@ module.exports = {
     }
 
     // Update user balance
-    user.cash += totalIncome;
+    user.cash = (user.cash ?? 0) + totalIncome;
     user.lastCollect = now;
-    updateUserRecord(user);
+    await updateUserRecord(user); // async
 
     // Build embed description
     let desc = "";
@@ -70,7 +70,8 @@ module.exports = {
     }
 
     const { embed, files } = embedTemplate({
-      title: "<:shines:1524097104547680276> Income Collected <:shines:1524097104547680276>",
+      title:
+        "<:shines:1524097104547680276> Income Collected <:shines:1524097104547680276>",
       description: desc,
       thumbnail: interaction.user.displayAvatarURL({ dynamic: true }),
       color: 0x3cf65b,

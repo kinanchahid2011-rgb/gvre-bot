@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const embedTemplate = require("../../utils/embedTemplate");
 const {
   getUserRecord,
@@ -54,9 +54,14 @@ module.exports = {
       return interaction.editReply({ embeds: [embed] });
     }
 
-    const receiverRecord = getUserRecord(receiver.id);
+    // JSONBin → async
+    const receiverRecord = await getUserRecord(receiver.id);
+
+    // Safety default
+    receiverRecord.cash = receiverRecord.cash ?? 0;
+
     receiverRecord.cash += amount;
-    updateUserRecord(receiverRecord);
+    await updateUserRecord(receiverRecord);
 
     const desc =
       `> <:bulletpoint:1524621721318195230> **Added to:** <@${receiver.id}>\n` +

@@ -10,8 +10,9 @@ module.exports = {
   async execute(interaction) {
     await interaction.deferReply();
 
-    const economy = loadEconomy();
-    const roleIncome = loadRoleIncome();
+    // JSONBin → async
+    const economy = await loadEconomy();
+    const roleIncome = await loadRoleIncome();
 
     if (!economy.length) {
       const { embed } = embedTemplate({
@@ -25,21 +26,21 @@ module.exports = {
     }
 
     // Total money
-    const totalMoney = economy.reduce((sum, u) => sum + u.cash, 0);
+    const totalMoney = economy.reduce((sum, u) => sum + (u.cash ?? 0), 0);
 
     // Average balance
     const avgBalance = Math.round(totalMoney / economy.length);
 
     // Richest user
     const richest = economy.reduce(
-      (max, u) => (u.cash > max.cash ? u : max),
+      (max, u) => ((u.cash ?? 0) > (max.cash ?? 0) ? u : max),
       economy[0],
     );
     const richestMember = interaction.guild.members.cache.get(richest.userId);
 
     // Poorest user
     const poorest = economy.reduce(
-      (min, u) => (u.cash < min.cash ? u : min),
+      (min, u) => ((u.cash ?? 0) < (min.cash ?? 0) ? u : min),
       economy[0],
     );
     const poorestMember = interaction.guild.members.cache.get(poorest.userId);
