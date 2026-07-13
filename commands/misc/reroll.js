@@ -7,36 +7,30 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("reroll")
     .setDescription("Reroll a giveaway by message ID (HR only).")
-    .addStringOption((option) =>
+    .addStringOption(option =>
       option
         .setName("messageid")
         .setDescription("The message ID of the giveaway to reroll.")
-        .setRequired(true),
+        .setRequired(true)
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles),
 
   async execute(interaction) {
-    // HR role
     const hrRoleId = "1481953102654607451";
 
-    // Defer reply (prevents Unknown Interaction)
+    // Prevent Unknown Interaction
     await interaction.deferReply({ flags: 64 });
 
-    // Permission check
     if (!interaction.member.roles.cache.has(hrRoleId)) {
-      return interaction.editReply({
-        content: "❌ Only HR can reroll giveaways.",
-      });
+      return interaction.editReply("❌ Only HR can reroll giveaways.");
     }
 
     const messageId = interaction.options.getString("messageid");
     const giveaways = loadGiveaways();
-    const giveaway = giveaways.find((g) => g.messageId === messageId);
+    const giveaway = giveaways.find(g => g.messageId === messageId);
 
     if (!giveaway) {
-      return interaction.editReply({
-        content: "❌ Giveaway not found.",
-      });
+      return interaction.editReply("❌ Giveaway not found.");
     }
 
     try {
@@ -44,18 +38,12 @@ module.exports = {
       const channel = guild.channels.cache.get(giveaway.channelId);
 
       if (!channel) {
-        return interaction.editReply({
-          content: "❌ Giveaway channel no longer exists.",
-        });
+        return interaction.editReply("❌ Giveaway channel no longer exists.");
       }
 
-      const giveawayMessage = await channel.messages
-        .fetch(giveaway.messageId)
-        .catch(() => null);
+      const giveawayMessage = await channel.messages.fetch(giveaway.messageId).catch(() => null);
       if (!giveawayMessage) {
-        return interaction.editReply({
-          content: "❌ Giveaway message not found.",
-        });
+        return interaction.editReply("❌ Giveaway message not found.");
       }
 
       // Ensure reactions are cached
@@ -64,21 +52,19 @@ module.exports = {
 
       const reaction = giveawayMessage.reactions.cache.get(giveaway.emoji);
       if (!reaction) {
-        return interaction.editReply({
-          content: "❌ No reaction data found.",
-        });
+        return interaction.editReply("❌ No reaction data found.");
       }
 
       const users = await reaction.users.fetch();
-      let entrants = users.filter((u) => !u.bot);
+      let entrants = users.filter(u => !u.bot);
 
       // Apply role restrictions
       if (giveaway.roleRestrictions.length > 0) {
-        entrants = entrants.filter((u) => {
+        entrants = entrants.filter(u => {
           const member = guild.members.cache.get(u.id);
           if (!member) return false;
-          return giveaway.roleRestrictions.every((roleId) =>
-            member.roles.cache.has(roleId),
+          return giveaway.roleRestrictions.every(roleId =>
+            member.roles.cache.has(roleId)
           );
         });
       }
@@ -98,13 +84,12 @@ module.exports = {
 
       // Build reroll embed
       const { embed, files } = embedTemplate({
-        title:
-          "<a:startilt:1524621292790222989> Giveaway Rerolled <a:startilt:1524621292790222989>",
+        title: "<a:startilt:1524621292790222989> Giveaway Rerolled <a:startilt:1524621292790222989>",
         description:
           `> <:gvreasterisk:1524624524849582101> **Prize:** ${giveaway.prize}\n` +
           `> <:gvreasterisk:1524624524849582101> **New Winners:** ${
             winners.length > 0
-              ? winners.map((w) => `<@${w.id}>`).join(", ")
+              ? winners.map(w => `<@${w.id}>`).join(", ")
               : "No valid entrants"
           }\n\n` +
           `> <:gvreasterisk:1524624524849582101> Giveaway has been rerolled by HR.`,
@@ -112,23 +97,19 @@ module.exports = {
         color: 0x3cf65b,
       });
 
-      // Send public reroll result
+      // Public reroll announcement
       await channel.send({
-        content:
-          winners.length > 0 ? winners.map((w) => `<@${w.id}>`).join(" ") : "",
+        content: winners.length > 0 ? winners.map(w => `<@${w.id}>`).join(" ") : "",
         embeds: [embed],
         files,
       });
 
-      // Ephemeral success message
-      await interaction.editReply({
-        content: "🔄 Giveaway rerolled successfully.",
-      });
+      // Ephemeral success
+      await interaction.editReply("🔄 Giveaway rerolled successfully.");
+
     } catch (err) {
       console.error("Reroll error:", err);
-      return interaction.editReply({
-        content: "❌ An error occurred while rerolling.",
-      });
+      return interaction.editReply("❌ An error occurred while rerolling.");
     }
   },
 };

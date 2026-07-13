@@ -34,7 +34,9 @@ module.exports = {
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles),
 
   async execute(interaction) {
+    // Prevent “Unknown interaction”
     await interaction.deferReply({ flags: 64 });
+
     const prize = interaction.options.getString("prize");
     const winners = interaction.options.getInteger("winners");
     const durationInput = interaction.options.getString("duration");
@@ -54,7 +56,7 @@ module.exports = {
     const endTimestamp = Math.floor((Date.now() + durationMs) / 1000);
     const channel = interaction.channel;
 
-    // Create giveaway embed
+    // Build embed
     const { embed, files } = embedTemplate({
       title:
         "<a:startilt:1524621292790222989> GVRE Giveaway <a:startilt:1524621292790222989>",
@@ -63,7 +65,7 @@ module.exports = {
         `> <:gvreasterisk:1524624524849582101> **Winners:** ${winners}\n` +
         `> <:gvreasterisk:1524624524849582101> **Ends:** <t:${endTimestamp}:R> (<t:${endTimestamp}:F>)\n` +
         (roleRestrictions.length
-          ? `> <:arrowright:1523736161770672209> **Role Restrictions:** ${roleRestrictions.map((r) => `<@&${r}>`).join(", ")}`
+          ? `> <:gvreasterisk:1524624524849582101> **Role Restrictions:** ${roleRestrictions.map((r) => `<@&${r}>`).join(", ")}`
           : "") +
         `\n\n> React with <a:startilt:1524621292790222989> to enter!`,
       banner: path.join(__dirname, "../../graphics/gvregiveaway.png"),
@@ -78,11 +80,11 @@ module.exports = {
       files,
     });
 
-    // React with the custom emoji ID
+    // React with custom emoji ID
     const emojiId = "1524621292790222989";
     await msg.react(emojiId);
 
-    // Save giveaway data for handler
+    // Save giveaway
     await saveGiveaway({
       messageId: msg.id,
       channelId: channel.id,
@@ -91,7 +93,7 @@ module.exports = {
       winners,
       endTime: endTimestamp,
       roleRestrictions,
-      emoji: emojiId, // ⭐ FIXED — must match reaction
+      emoji: emojiId,
     });
 
     await interaction.editReply({
