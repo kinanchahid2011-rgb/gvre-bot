@@ -13,8 +13,6 @@ module.exports = {
     .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages),
 
   async execute(interaction) {
-    await interaction.deferReply();
-
     const member = interaction.member;
     const userId = interaction.user.id;
 
@@ -30,17 +28,15 @@ module.exports = {
     if (user.lastCollect && now - user.lastCollect < cooldownMs) {
       const remaining = cooldownMs - (now - user.lastCollect);
 
+      await interaction.deferReply({ ephemeral: true });
+
       const { embed, files } = embedTemplate({
         title: "⏳ Cooldown Active",
         description: `You already collected.\nTry again <t:${Math.floor((now + remaining) / 1000)}:R>.`,
         color: 0xffcc00,
       });
 
-      return interaction.editReply({
-        embeds: [embed],
-        files,
-        flags: 64, // ephemeral
-      });
+      return interaction.editReply({ embeds: [embed], files });
     }
 
     // -----------------------------------------------------
@@ -60,15 +56,17 @@ module.exports = {
     // NO INCOME ROLES → EPHEMERAL
     // -----------------------------------------------------
     if (totalIncome === 0) {
+      await interaction.deferReply({ ephemeral: true });
       return interaction.editReply({
         content: "❌ You don't have any income-eligible roles.",
-        flags: 64, // ephemeral
       });
     }
 
     // -----------------------------------------------------
     // SUCCESSFUL COLLECT → PUBLIC
     // -----------------------------------------------------
+    await interaction.deferReply(); // normal public reply
+
     user.cash = (user.cash ?? 0) + totalIncome;
     user.lastCollect = now;
     await updateUserRecord(user);
@@ -92,9 +90,6 @@ module.exports = {
       color: 0x3cf65b,
     });
 
-    return interaction.editReply({
-      embeds: [embed],
-      files,
-    });
+    return interaction.editReply({ embeds: [embed], files });
   },
 };
